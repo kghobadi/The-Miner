@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class OrbitalMotion : MonoBehaviour {
 
-    public Transform sun;
-    public GameObject asteroid;
+    public Transform pointOfOrbit;
+    public GameObject orbiter;
 
     public float rotationSpeed;
     public float orbitalSpeed;
@@ -16,8 +16,9 @@ public class OrbitalMotion : MonoBehaviour {
 	
 
 	void Update () {
-        asteroid.transform.RotateAround(asteroid.transform.position, Vector3.forward, rotationSpeed);
-        asteroid.transform.RotateAround(sun.transform.position, Vector3.forward, rotationSpeed);
+        orbiter.transform.RotateAround(orbiter.transform.position, Vector3.forward, rotationSpeed); //rotates object like a spinning planet. center is itself
+
+        orbiter.transform.RotateAround(pointOfOrbit.transform.position, Vector3.forward, orbitalSpeed); //rotates object around another object. the orbital motion
 		
 	}
 }
