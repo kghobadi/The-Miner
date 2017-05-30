@@ -19,6 +19,8 @@ public class ObjectGravity : MonoBehaviour {
 
 	void Update () {
         incomingGravity = GetComponentInParent<PlanetGravity>().gravitationalAcceleration * asteroidObject.mass; // F = mg
+
+        asteroidObject.AddRelativeForce(asteroidObject.transform.position.x, incomingGravity, 0); //Apply gravity to the object so that its pulled closer to the planet
 		
 	}
 }
