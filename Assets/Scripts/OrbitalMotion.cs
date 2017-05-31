@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class OrbitalMotion : MonoBehaviour {
 
-    public Transform pointOfOrbit;
+    public GameObject pointOfOrbit;
     public GameObject orbiter;
 
     public float rotationSpeed;
