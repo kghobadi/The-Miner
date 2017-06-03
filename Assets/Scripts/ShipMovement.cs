@@ -5,7 +5,9 @@ using UnityEngine;
 public class ShipMovement : MonoBehaviour
 {
     Rigidbody ship;
- 
+
+    const float CLICK_Z_POSITION = 0;
+
     public float speed = 10f;
 
     private Vector3 targetPosition;
@@ -38,14 +40,21 @@ public class ShipMovement : MonoBehaviour
 
     void SetTargetPosition()
     {
-        Plane plane = new Plane(Vector3.back, transform.position);
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        float point = 0f;
+        Vector3 p = new Vector3();
+        Camera c = Camera.main;
+        Vector2 mousePos = new Vector2();
 
-        if(plane.Raycast (ray, out point))
-        {
-            targetPosition = ray.GetPoint(point);
-        }
+        // Get the mouse position from Event.
+        // Note that the y position from Event is inverted.
+        mousePos.x = Input.mousePosition.x;
+        mousePos.y = Input.mousePosition.y;
+
+        p = c.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, c.nearClipPlane));
+        p.z = CLICK_Z_POSITION;
+
+        Debug.Log(p);
+
+        targetPosition = p;
 
         isMoving = true;
 
@@ -56,8 +65,9 @@ public class ShipMovement : MonoBehaviour
         transform.LookAt(targetPosition);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
 
-        if(transform.position == targetPosition)
+        if(Vector3.Distance(transform.position, targetPosition) < 0.05f)
         {
+            transform.position = targetPosition;
             isMoving = false;
         }
 
