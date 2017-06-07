@@ -10,6 +10,8 @@ public class ShipMovement : MonoBehaviour
 
     public float speed = 10f;
 
+    public ParticleSystem engineFire;
+
     private Vector3 targetPosition;
     private bool isMoving;
     
@@ -21,6 +23,7 @@ public class ShipMovement : MonoBehaviour
 
         targetPosition = transform.position;
         isMoving = false;
+        engineFire.Pause();
 	   
 	}
 
@@ -34,6 +37,7 @@ public class ShipMovement : MonoBehaviour
         if (isMoving)
         {
             MovePlayer();
+            
         }
         
     }
@@ -62,13 +66,16 @@ public class ShipMovement : MonoBehaviour
 
     void MovePlayer()
     {
+        engineFire.Play();
         transform.LookAt(targetPosition);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        
 
         if(Vector3.Distance(transform.position, targetPosition) < 0.05f)
         {
             transform.position = targetPosition;
             isMoving = false;
+            engineFire.Stop();
         }
 
         Debug.DrawLine(transform.position, targetPosition, Color.red);
