@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.AI;
 
 namespace CompleteProject
 {
@@ -10,13 +9,13 @@ namespace CompleteProject
 
         private Animator anim;
         private NavMeshAgent navMeshAgent;
-        private Transform targetedSymbol;
+        private Transform targetedEnemy;
         private Ray shootRay;
         private RaycastHit shootHit;
         private bool walking;
         private bool enemyClicked;
         private float nextFire;
-        
+
         void Awake()
         {
             anim = GetComponent<Animator>();
@@ -31,9 +30,9 @@ namespace CompleteProject
             {
                 if (Physics.Raycast(ray, out hit, 100))
                 {
-                    if (hit.collider.CompareTag("Symbol"))
+                    if (hit.collider.CompareTag("Enemy"))
                     {
-                        targetedSymbol = hit.transform;
+                        targetedEnemy = hit.transform;
                         enemyClicked = true;
                     }
 
@@ -45,6 +44,11 @@ namespace CompleteProject
                         navMeshAgent.Resume();
                     }
                 }
+            }
+
+            if (enemyClicked)
+            {
+                MoveAndShoot();
             }
 
             if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
@@ -60,7 +64,32 @@ namespace CompleteProject
             anim.SetBool("IsWalking", walking);
         }
 
-        
+        private void MoveAndShoot()
+        {
+            if (targetedEnemy == null)
+                return;
+            navMeshAgent.destination = targetedEnemy.position;
+            if (navMeshAgent.remainingDistance >= shootDistance)
+            {
+
+                navMeshAgent.Resume();
+                walking = true;
+            }
+
+            if (navMeshAgent.remainingDistance <= shootDistance)
+            {
+
+                transform.LookAt(targetedEnemy);
+                Vector3 dirToShoot = targetedEnemy.transform.position - transform.position;
+                if (Time.time > nextFire)
+                {
+                    nextFire = Time.time + shootRate;
+                    shootingScript.Shoot(dirToShoot);
+                }
+                navMeshAgent.Stop();
+                walking = false;
+            }
+        }
 
     }
 
