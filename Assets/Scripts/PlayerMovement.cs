@@ -1,96 +1,65 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
 
-namespace CompleteProject
+public class PlayerMovement : MonoBehaviour
 {
 
-    public class ClickToMove : MonoBehaviour
+    private Animator anim;
+    private NavMeshAgent navMeshAgent;
+    private Transform targetedSymbol;
+    private Ray shootRay;
+    private RaycastHit shootHit;
+    private bool walking;
+    private bool symbolClicked;
+    private float nextFire;
+
+    void Awake()
     {
-
-        private Animator anim;
-        private NavMeshAgent navMeshAgent;
-        private Transform targetedEnemy;
-        private Ray shootRay;
-        private RaycastHit shootHit;
-        private bool walking;
-        private bool enemyClicked;
-        private float nextFire;
-
-        void Awake()
-        {
-            anim = GetComponent<Animator>();
-            navMeshAgent = GetComponent<NavMeshAgent>();
-        }
+        anim = GetComponent<Animator>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+    }
         
-        void Update()
+    void Update()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Input.GetButtonDown("Fire2"))
+            if (Physics.Raycast(ray, out hit, 100))
             {
-                if (Physics.Raycast(ray, out hit, 100))
+                if (hit.collider.CompareTag("Symbol"))
                 {
-                    if (hit.collider.CompareTag("Enemy"))
-                    {
-                        targetedEnemy = hit.transform;
-                        enemyClicked = true;
-                    }
+                    targetedSymbol = hit.transform;
+                    symbolClicked = true;
+                }
 
-                    else
-                    {
-                        walking = true;
-                        enemyClicked = false;
-                        navMeshAgent.destination = hit.point;
-                        navMeshAgent.Resume();
-                    }
+                else
+                {
+                    walking = true;
+                    symbolClicked = false;
+                    navMeshAgent.destination = hit.point;
+                    navMeshAgent.isStopped = false;
                 }
             }
-
-            if (enemyClicked)
-            {
-                MoveAndShoot();
-            }
-
-            if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
-            {
-                if (!navMeshAgent.hasPath || Mathf.Abs(navMeshAgent.velocity.sqrMagnitude) < float.Epsilon)
-                    walking = false;
-            }
-            else
-            {
-                walking = true;
-            }
-
-            anim.SetBool("IsWalking", walking);
         }
 
-        private void MoveAndShoot()
+        if (symbolClicked)
         {
-            if (targetedEnemy == null)
-                return;
-            navMeshAgent.destination = targetedEnemy.position;
-            if (navMeshAgent.remainingDistance >= shootDistance)
-            {
+            //PuzzleTrigger();
+        }
 
-                navMeshAgent.Resume();
-                walking = true;
-            }
-
-            if (navMeshAgent.remainingDistance <= shootDistance)
-            {
-
-                transform.LookAt(targetedEnemy);
-                Vector3 dirToShoot = targetedEnemy.transform.position - transform.position;
-                if (Time.time > nextFire)
-                {
-                    nextFire = Time.time + shootRate;
-                    shootingScript.Shoot(dirToShoot);
-                }
-                navMeshAgent.Stop();
+        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            if (!navMeshAgent.hasPath || Mathf.Abs(navMeshAgent.velocity.sqrMagnitude) < float.Epsilon)
                 walking = false;
-            }
+        }
+        else
+        {
+            walking = true;
         }
 
+        anim.SetBool("IsWalking", walking);
     }
 
 }
