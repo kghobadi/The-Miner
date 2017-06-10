@@ -4,62 +4,28 @@ using UnityEngine.AI;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public GameObject player;
+    Vector3 targetPosition;
+    public float speed;
 
-    private Animator anim;
-    private NavMeshAgent navMeshAgent;
-    private Transform targetedSymbol;
-    private Ray shootRay;
-    private RaycastHit shootHit;
-    private bool walking;
-    private bool symbolClicked;
-    private float nextFire;
-
-    void Awake()
+    void Start()
     {
-        anim = GetComponent<Animator>();
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        targetPosition = transform.position;
     }
-        
+
     void Update()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
         if (Input.GetMouseButtonDown(0))
         {
-            if (Physics.Raycast(ray, out hit, 100))
-            {
-                if (hit.collider.CompareTag("Symbol"))
-                {
-                    targetedSymbol = hit.transform;
-                    symbolClicked = true;
-                }
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-                else
-                {
-                    walking = true;
-                    symbolClicked = false;
-                    navMeshAgent.destination = hit.point;
-                    navMeshAgent.isStopped = false;
-                }
+            if (Physics.Raycast(ray, out hit))
+            {
+                targetPosition = hit.point;
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
             }
         }
-
-        if (symbolClicked)
-        {
-            //PuzzleTrigger();
-        }
-
-        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
-        {
-            if (!navMeshAgent.hasPath || Mathf.Abs(navMeshAgent.velocity.sqrMagnitude) < float.Epsilon)
-                walking = false;
-        }
-        else
-        {
-            walking = true;
-        }
-
-        anim.SetBool("IsWalking", walking);
     }
 
 }
